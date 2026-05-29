@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /src
 
 # Устанавливаем системные зависимости
 RUN apt-get update && apt-get install -y \
@@ -17,11 +17,5 @@ COPY src/ ./src/
 # Создаем папки для данных и логов
 RUN mkdir -p /app/data /app/logs
 
-# Добавляем /app в PYTHONPATH
-ENV PYTHONPATH=/app
-
-# Устанавливаем рабочую директорию
-WORKDIR /app
-
 # Команда запуска
-CMD ["python", "-m", "app.src.store_check_bot.main"]
+CMD ["python", "-m", "src.store_check_bot.main"]
