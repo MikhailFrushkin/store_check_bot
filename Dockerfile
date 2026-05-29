@@ -11,11 +11,14 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем исходный код
-COPY src/ ./src/
+# Копируем исходный код (папка src из проекта прямо в /src)
+COPY src/ ./
 
 # Создаем папки для данных и логов
-RUN mkdir -p /app/data /app/logs
+RUN mkdir -p /src/data /src/logs
 
-# Команда запуска
-CMD ["python", "-m", "src.store_check_bot.main"]
+# Добавляем /src в PYTHONPATH
+ENV PYTHONPATH=/src
+
+# Команда запуска (теперь путь правильный)
+CMD ["python", "-m", "store_check_bot.main"]
