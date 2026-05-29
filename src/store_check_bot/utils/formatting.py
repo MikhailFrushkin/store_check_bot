@@ -30,7 +30,7 @@ def product_caption(product: Product, status: str | None = None) -> str:
     )
 
 
-def format_department_header(on_date: date, department: int, articles: list[Product]) -> str:
+def format_department_header(on_date: date, department: int, articles: list[Product], data_dep: dict) -> str:
     """
     Заголовок при входе в отдел: дата и список артикулов на сегодня.
     """
@@ -39,8 +39,17 @@ def format_department_header(on_date: date, department: int, articles: list[Prod
         f"<b>Сегодня {date_str}</b>",
         f"Отдел {department}: нужно отработать эти артикула ({len(articles)} шт.):\n",
     ]
+    if data_dep['checked'] == data_dep['total']:
+        lines = ["Все артикула отработаны 💪"]
+    else:
+        lines.extend([
+            f"✅ Отработано: {data_dep['present']} \n"
+            f"❌ Не отработано: {data_dep['absent']} \n"
+            f"⏳ Без отметки: {data_dep['unchecked']}",
+        ])
     # for product in articles:
     #     lines.append(f"• <code>{product.article}</code> — {product.name[:60]}")
+
     return "\n".join(lines)
 
 

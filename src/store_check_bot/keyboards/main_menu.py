@@ -43,9 +43,9 @@ def main_menu_keyboard(full_access: bool = False) -> ReplyKeyboardMarkup:
             [
                 KeyboardButton(text=BTN_UPLOAD),
                 KeyboardButton(text=BTN_RESULTS),
+                KeyboardButton(text=BTN_SETTINGS)
             ]
         )
-        rows.append([KeyboardButton(text=BTN_SETTINGS)])
 
     return ReplyKeyboardMarkup(
         keyboard=rows,

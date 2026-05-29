@@ -12,7 +12,7 @@ from aiogram.types import FSInputFile, Message
 from store_check_bot.config import settings
 from store_check_bot.db.database import async_session
 from store_check_bot.filters.admin import message_from_privileged
-from store_check_bot.keyboards.main_menu import BTN_RESULTS, BTN_UPLOAD, main_menu_keyboard
+from store_check_bot.keyboards.main_menu import BTN_RESULTS, BTN_UPLOAD, BTN_SETTINGS, main_menu_keyboard
 from store_check_bot.repositories.products import get_all_stats
 from store_check_bot.services.daily_assignment import assign_daily_products
 from store_check_bot.services.excel_export import build_results_workbook
@@ -38,7 +38,8 @@ async def start_upload(message: Message, state: FSMContext) -> None:
         "Отправьте Excel <b>Неучтенные товары.xlsx</b> (.xlsx).\n\n"
         "Колонки как в выгрузке: Магазин, Отдел, Подотдел, Артикул, "
         "Наименование, LOC, …\n\n"
-        "При загрузке сбрасывается очередь показа артикулов.",
+        "При загрузке сбрасывается очередь показа артикулов.\n\n"
+        "Для отмены нажмите /menu",
         parse_mode="HTML",
     )
 
@@ -85,10 +86,40 @@ async def process_upload(message: Message, state: FSMContext) -> None:
     )
 
 
+@router.message(StateFilter(UploadStates.waiting_file), F.text == BTN_RESULTS)
+async def upload_cancel_for_results(message: Message, state: FSMContext) -> None:
+    """Отмена загрузки при нажатии на кнопку Результаты."""
+    await state.clear()
+    # Вызываем обработчик результатов
+    await show_results(message)
+
+
+@router.message(StateFilter(UploadStates.waiting_file), F.text == BTN_SETTINGS)
+async def upload_cancel_for_settings(message: Message, state: FSMContext) -> None:
+    """Отмена загрузки при нажатии на кнопку Настройки."""
+    await state.clear()
+    await message.answer(
+        "Загрузка файла отменена.",
+        reply_markup=main_menu_keyboard(full_access=True)
+    )
+
+
+@router.message(StateFilter(UploadStates.waiting_file), F.text == "/menu")
+async def upload_cancel_menu(message: Message, state: FSMContext) -> None:
+    """Отмена загрузки по команде /menu."""
+    await state.clear()
+    await message.answer(
+        "Загрузка файла отменена.",
+        reply_markup=main_menu_keyboard(full_access=True)
+    )
+
+
 @router.message(StateFilter(UploadStates.waiting_file))
 async def upload_wrong_type(message: Message) -> None:
     """В режиме загрузки принимаем только документ."""
-    await message.answer("Отправьте .xlsx или /menu для отмены.")
+    await message.answer(
+        "Отправьте .xlsx или нажмите /menu для отмены."
+    )
 
 
 @router.message(F.text == BTN_RESULTS)
@@ -97,7 +128,6 @@ async def show_results(message: Message) -> None:
     if not message_from_privileged(message):
         await message.answer("Доступно только администраторам.")
         return
-
     async with async_session() as session:
         stats = await get_all_stats(session, settings.departments_count)
         export_path = await build_results_workbook(session, EXPORT_DIR)

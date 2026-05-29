@@ -3,6 +3,7 @@
 """
 
 from datetime import datetime
+from pprint import pprint
 
 from aiogram import F, Router
 from aiogram.types import Message
@@ -13,7 +14,7 @@ from store_check_bot.services.runtime_settings import get_runtime_settings
 from store_check_bot.filters.admin import message_from_privileged
 from store_check_bot.keyboards.main_menu import BTN_DEPT_PREFIX, back_keyboard, main_menu_keyboard
 from store_check_bot.keyboards.product_inline import product_check_keyboard
-from store_check_bot.repositories.products import get_user_verification
+from store_check_bot.repositories.products import get_user_verification, get_department_stats
 from store_check_bot.services.daily_assignment import assign_daily_products, get_today_products
 from store_check_bot.utils.formatting import format_department_header
 from store_check_bot.utils.messages import send_product_card
@@ -65,8 +66,10 @@ async def open_department(message: Message) -> None:
         )
         return
 
+    data_dep = await get_department_stats(session, department)
+    pprint(data_dep)
     await message.answer(
-        format_department_header(today, department, products),
+        format_department_header(today, department, products, data_dep),
         reply_markup=back_keyboard(),
         parse_mode="HTML",
     )

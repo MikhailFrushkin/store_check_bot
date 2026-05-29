@@ -23,6 +23,7 @@ async def cmd_start(message: Message) -> None:
 
     Пользователь попадает в список рассылки сводок (10, 12, 14, 16).
     """
+
     if message.from_user:
         async with async_session() as session:
             await register_bot_user(session, message.from_user)
