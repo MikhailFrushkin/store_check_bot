@@ -1,0 +1,40 @@
+[project]
+name = "store-check-bot"
+version = "0.1.0"
+description = "Telegram bot for simplified in-store product verification"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiogram>=3.13,<4",
+    "aiosqlite>=0.20",
+    "openpyxl>=3.1",
+    "pydantic-settings>=2.6",
+    "python-dotenv>=1.0",
+    "sqlalchemy[asyncio]>=2.0",
+    "apscheduler>=3.10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.8",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+store-check-bot = "store_check_bot.main:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
