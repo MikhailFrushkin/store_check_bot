@@ -114,8 +114,8 @@ def format_daily_summary(
     lines = [
         f"<b>📋 Сводка на {date_str}</b>",
         f"Всего к проверке: <b>{total}</b> арт.",
-        f"✅ Отработано: {progress['processed']} | "
-        f"❌ Не отработано: {progress['not_processed']} | "
+        f"✅ Отработано: {progress['processed']} \n"
+        f"❌ Не отработано: {progress['not_processed']} \n"
         f"⏳ Без отметки: {progress['pending']}",
         "",
         "<b>По отделам:</b>",
