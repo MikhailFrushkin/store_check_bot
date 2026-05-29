@@ -20,7 +20,7 @@ ENV_CANDIDATES = (
 )
 
 # Часовой пояс для планировщика и «сегодня»
-DEFAULT_TIMEZONE = ZoneInfo("Europe/Moscow")
+DEFAULT_TIMEZONE = ZoneInfo("Asia/Novosibirsk")
 
 
 def resolve_env_file() -> Path:
@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     products_per_day: int = 10
     daily_assign_hour: int = 6
     summary_hours: str = "10,12,14,16"
-    timezone: str = "Europe/Moscow"
+    timezone: str = "Asia/Novosibirsk"
 
     @field_validator("admin_user_ids", mode="before")
     @classmethod

@@ -1,0 +1,33 @@
+version: '3.11'
+
+services:
+  bot:
+    build: .
+    container_name: store_check_bot
+    restart: always  # Постоянный перезапуск при ошибках
+    environment:
+      - TZ=Asia/Novosibirsk
+      - BOT_TOKEN=${BOT_TOKEN}
+      # Добавьте другие переменные окружения по необходимости
+    volumes:
+      # Монтируем папку с базой данных для сохранения данных между перезапусками
+      - ./data:/app/data
+      # Опционально: монтируем логи
+      - ./logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - bot_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  bot_network:
+    driver: bridge
