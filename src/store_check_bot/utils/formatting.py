@@ -37,10 +37,10 @@ def format_department_header(on_date: date, department: int, articles: list[Prod
     date_str = on_date.strftime("%d.%m.%Y")
     lines = [
         f"<b>Сегодня {date_str}</b>",
-        f"Отдел {department}: нужно отработать эти артикулы ({len(articles)} шт.):\n",
+        f"Отдел {department}: нужно отработать эти артикула ({len(articles)} шт.):\n",
     ]
-    for product in articles:
-        lines.append(f"• <code>{product.article}</code> — {product.name[:60]}")
+    # for product in articles:
+    #     lines.append(f"• <code>{product.article}</code> — {product.name[:60]}")
     return "\n".join(lines)
 
 

@@ -2,16 +2,17 @@ services:
   bot:
     build: .
     container_name: store_check_bot
-    restart: always  # Постоянный перезапуск при ошибках
+    restart: always
     environment:
       - TZ=Asia/Novosibirsk
       - BOT_TOKEN=${BOT_TOKEN}
-      # Добавьте другие переменные окружения по необходимости
+      - ADMIN_USER_IDS=${ADMIN_USER_IDS}
     volumes:
-      # Монтируем папку с базой данных для сохранения данных между перезапусками
-      - ./data:/app/data
-      # Опционально: монтируем логи
-      - ./logs:/app/logs
+      # Сохраняем базу данных (монтируем корневую папку проекта)
+      - ./:/app
+      # Исключаем папку src из монтирования (опционально, для производительности)
+      - /app/src
+    working_dir: /app
     logging:
       driver: "json-file"
       options:
@@ -19,12 +20,6 @@ services:
         max-file: "3"
     networks:
       - bot_network
-    healthcheck:
-      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
 
 networks:
   bot_network:

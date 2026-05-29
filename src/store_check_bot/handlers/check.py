@@ -16,7 +16,7 @@ from store_check_bot.utils.formatting import product_caption
 
 router = Router()
 
-COMPLETION_MESSAGE = "Все артикула на сегодня отработаны, хорошая работа =)"
+COMPLETION_MESSAGE = "Все артикула на сегодня отработаны, хорошая работа 👍"
 
 
 @router.callback_query(lambda c: c.data and c.data.startswith("check:"))

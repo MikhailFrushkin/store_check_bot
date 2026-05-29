@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /src
+WORKDIR /app
 
 # Устанавливаем системные зависимости
 RUN apt-get update && apt-get install -y \
@@ -11,14 +11,14 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем исходный код (папка src из проекта прямо в /src)
-COPY src/ ./
+# Копируем исходный код
+COPY src/ ./src/
 
 # Создаем папки для данных и логов
-RUN mkdir -p /src/data /src/logs
+RUN mkdir -p /app/data /app/logs
 
-# Добавляем /src в PYTHONPATH
-ENV PYTHONPATH=/src
+# Добавляем /app в PYTHONPATH
+ENV PYTHONPATH=/app
 
-# Команда запуска (теперь путь правильный)
-CMD ["python", "-m", "store_check_bot.main"]
+# Команда запуска
+CMD ["python", "-m", "src.store_check_bot.main"]

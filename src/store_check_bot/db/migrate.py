@@ -39,9 +39,6 @@ NEW_COLUMNS: list[tuple[str, str, str]] = [
     ("app_settings", "products_per_day", "INTEGER"),
 ]
 
-# Колонки старой версии бота (мешают INSERT без barcode)
-LEGACY_PRODUCT_COLUMNS = ("barcode", "address", "image_url")
-
 
 async def run_migrations(engine: AsyncEngine) -> None:
     """Добавить новые колонки и убрать устаревшие в products."""
@@ -73,24 +70,5 @@ async def run_migrations(engine: AsyncEngine) -> None:
                     )
                 )
 
-            # Индексы старой схемы мешают DROP COLUMN в SQLite
-            if "barcode" in existing:
-                sync_conn.execute(text("DROP INDEX IF EXISTS ix_products_barcode"))
-
-            for column in LEGACY_PRODUCT_COLUMNS:
-                if column not in existing:
-                    continue
-                try:
-                    sync_conn.execute(text(f"ALTER TABLE products DROP COLUMN {column}"))
-                    logger.info("Миграция: удалена устаревшая колонка products.%s", column)
-                    existing.discard(column)
-                except Exception as exc:
-                    logger.error(
-                        "Не удалось удалить products.%s: %s. "
-                        "Удалите store_check.db в корне проекта и перезапустите бота.",
-                        column,
-                        exc,
-                    )
-                    raise
 
         await conn.run_sync(_migrate)
