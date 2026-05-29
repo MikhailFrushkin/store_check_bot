@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Устанавливаем системные зависимости (если нужны)
+# Устанавливаем системные зависимости
 RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
@@ -16,6 +16,9 @@ COPY src/ ./src/
 
 # Создаем папки для данных и логов
 RUN mkdir -p /app/data /app/logs
+
+# Добавляем /app в PYTHONPATH
+ENV PYTHONPATH=/app
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
