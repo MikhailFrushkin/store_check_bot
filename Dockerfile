@@ -24,4 +24,4 @@ ENV PYTHONPATH=/app
 WORKDIR /app
 
 # Команда запуска
-CMD ["python", "-m", "src.store_check_bot.main"]
+CMD ["python", "-m", "app.src.store_check_bot.main"]
