@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import pytz
 from dotenv import dotenv_values, load_dotenv
 from pydantic import ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -19,8 +20,8 @@ ENV_CANDIDATES = (
     PACKAGE_DIR / ".env",
 )
 
-# Часовой пояс для планировщика и «сегодня»
-DEFAULT_TIMEZONE = ZoneInfo("Asia/Novosibirsk")
+DEFAULT_TIMEZONE = "Asia/Novosibirsk"  # Строка, а не объект
+DEFAULT_TZ = pytz.timezone(DEFAULT_TIMEZONE)  # Создаем объект здесь же
 
 
 def resolve_env_file() -> Path:
@@ -48,7 +49,7 @@ class Settings(BaseSettings):
     bot_token: str
     admin_user_ids: list[int] = []
     products_per_day: int = 10
-    daily_assign_hour: int = 6
+    daily_assign_hour: int = 8
     summary_hours: str = "10,12,14,16"
     timezone: str = "Asia/Novosibirsk"
 

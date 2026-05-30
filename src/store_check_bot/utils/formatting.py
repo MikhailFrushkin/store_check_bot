@@ -67,8 +67,8 @@ def format_stats_message(stats: list[dict[str, int]]) -> str:
             lines.append(f"Отдел {dept}: нет назначений на сегодня")
             continue
         lines.append(
-            f"<b>Отдел {dept}</b>: назначено {row['total']} "
-            f"(✅ {row['present']}, ❌ {row['absent']}, ⏳ {row['unchecked']})"
+            f"<b>Отдел {dept}</b>: назначено {row['total']}\n"
+            f"✅ {row['present']}, ❌ {row['absent']}, ⏳ {row['unchecked']}\n"
         )
         total_assigned += row["total"]
         total_processed += row["present"]

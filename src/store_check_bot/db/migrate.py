@@ -5,12 +5,9 @@
 чтобы не ломать вставку по новой модели с полем article.
 """
 
-import logging
-
 from sqlalchemy import inspect, text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-logger = logging.getLogger(__name__)
 
 # (таблица, колонка, SQL тип)
 NEW_COLUMNS: list[tuple[str, str, str]] = [

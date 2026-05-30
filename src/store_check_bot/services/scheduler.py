@@ -4,11 +4,11 @@
 Задачи читают расписание из БД (настройки администратора).
 """
 
-import logging
 from datetime import datetime
 
 from aiogram import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from loguru import logger
 
 from store_check_bot.config import settings
 from store_check_bot.db.database import async_session
@@ -18,7 +18,6 @@ from store_check_bot.services.daily_assignment import assign_daily_products, get
 from store_check_bot.services.runtime_settings import get_runtime_settings
 from store_check_bot.utils.formatting import format_daily_summary
 
-logger = logging.getLogger(__name__)
 
 _scheduler: AsyncIOScheduler | None = None
 _bot: Bot | None = None
@@ -35,7 +34,7 @@ async def job_assign_daily_products() -> None:
     """Задача по расписанию: новые артикулы на день по отделам."""
     async with async_session() as session:
         count = await assign_daily_products(session)
-    logger.info("Планировщик: назначено %s артикулов", count)
+    logger.info(f"Планировщик: назначено {count} артикулов", )
 
 
 async def job_send_summary(bot: Bot | None = None) -> None:
@@ -69,8 +68,9 @@ async def apply_scheduler_jobs(scheduler: AsyncIOScheduler, bot: Bot) -> None:
     scheduler.add_job(
         job_assign_daily_products,
         "cron",
-        hour=runtime.daily_assign_hour,
-        minute=0,
+        # hour=runtime.daily_assign_hour,
+        hour=11,
+        minute=33,
         id="assign_daily_products",
         replace_existing=True,
     )
@@ -91,10 +91,7 @@ async def apply_scheduler_jobs(scheduler: AsyncIOScheduler, bot: Bot) -> None:
         )
 
     logger.info(
-        "Планировщик обновлён: назначение в %s:00, сводки в %s",
-        runtime.daily_assign_hour,
-        runtime.summary_hours,
-    )
+        f"Планировщик обновлён: назначение в {runtime.daily_assign_hour}, сводки в {runtime.summary_hours}")
 
 
 def setup_scheduler(bot: Bot) -> AsyncIOScheduler:

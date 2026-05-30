@@ -3,8 +3,9 @@
 """
 
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
+from loguru import logger
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +13,6 @@ from store_check_bot.config import settings
 from store_check_bot.db.models import DailyAssignment, Product, Verification, VerificationStatus
 from store_check_bot.services.runtime_settings import get_runtime_settings
 
-logger = logging.getLogger(__name__)
 
 
 async def get_today_products(
@@ -61,7 +61,6 @@ async def assign_daily_products(
     """
     if on_date is None:
         on_date = datetime.now(settings.tz).date()
-
     runtime = await get_runtime_settings(session)
     departments = [department] if department else range(1, settings.departments_count + 1)
     total_assigned = 0
@@ -102,10 +101,11 @@ async def assign_daily_products(
             )
             product.shown_for_check_date = on_date
             total_assigned += 1
+            # logger.debug(f"{dept} - {product.article}")
 
     if total_assigned:
         await session.commit()
-        logger.info("Назначено артикулов на %s: %s", on_date, total_assigned)
+        logger.info(f"Назначено артикулов на {on_date} {total_assigned}")
     return total_assigned
 
 

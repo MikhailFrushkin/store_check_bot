@@ -3,7 +3,6 @@
 """
 
 from datetime import datetime
-from pprint import pprint
 
 from aiogram import F, Router
 from aiogram.types import Message
@@ -67,7 +66,6 @@ async def open_department(message: Message) -> None:
         return
 
     data_dep = await get_department_stats(session, department)
-    pprint(data_dep)
     await message.answer(
         format_department_header(today, department, products, data_dep),
         reply_markup=back_keyboard(),

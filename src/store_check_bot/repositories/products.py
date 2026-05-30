@@ -1,7 +1,7 @@
 """
 Запросы к БД: проверки и выгрузка для Excel.
 """
-
+from loguru import logger
 from sqlalchemy import func, select
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -92,7 +92,10 @@ async def get_all_stats(session: AsyncSession, departments_count: int) -> list[d
 
 
 async def get_verifications_for_export(session: AsyncSession) -> list[tuple]:
-    """Строки для Excel: товар + отметка + дата вывода на проверку."""
+    """Строки для Excel: товар + отметка + дата вывода на проверку.
+
+    Возвращает только товары, которые были показаны на проверку.
+    """
     result = await session.execute(
         select(
             Product.department,
@@ -106,7 +109,8 @@ async def get_verifications_for_export(session: AsyncSession) -> list[tuple]:
             Verification.username,
             Verification.updated_at,
         )
-        .join(Verification, Verification.product_id == Product.id)
+        .outerjoin(Verification, Verification.product_id == Product.id)
+        .where(Product.shown_for_check_date.is_not(None))  # Только показанные товары
         .order_by(Product.department, Product.article)
     )
     return list(result.all())

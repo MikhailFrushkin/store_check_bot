@@ -13,10 +13,16 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
-    Text,
     UniqueConstraint,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+from store_check_bot.config import DEFAULT_TZ
+
+
+def get_novosibirsk_time():
+    """Возвращает текущее время в Новосибирске (UTC+7)."""
+    return datetime.now(DEFAULT_TZ)
 
 
 class Base(DeclarativeBase):
@@ -87,9 +93,9 @@ class Verification(Base):
     full_name: Mapped[str] = mapped_column(String(500))
     status: Mapped[str] = mapped_column(String(20))
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        DateTime(timezone=True),  # Включаем поддержку timezone
+        default=get_novosibirsk_time,  # Функция, а не результат вызова
+        onupdate=get_novosibirsk_time,  # При обновлении
     )
 
     product: Mapped["Product"] = relationship(back_populates="verifications")

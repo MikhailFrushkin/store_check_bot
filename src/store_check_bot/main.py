@@ -11,15 +11,13 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
+from loguru import logger
 
 from store_check_bot.config import settings
 from store_check_bot.db.database import async_session, init_db
 from store_check_bot.handlers import router
 from store_check_bot.services.daily_assignment import assign_daily_products
 from store_check_bot.services.scheduler import apply_scheduler_jobs, setup_scheduler
-
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-logger = logging.getLogger(__name__)
 
 
 async def on_startup(bot: Bot) -> None:
@@ -40,7 +38,7 @@ async def on_startup(bot: Bot) -> None:
         if now.hour >= runtime.daily_assign_hour:
             assigned = await assign_daily_products(session)
             if assigned:
-                logger.info("При старте назначено артикулов: %s", assigned)
+                logger.info(f"При старте назначено артикулов: {assigned}")
 
     scheduler = setup_scheduler(bot)
     await apply_scheduler_jobs(scheduler, bot)
@@ -49,6 +47,39 @@ async def on_startup(bot: Bot) -> None:
 
 async def main() -> None:
     """Запуск polling."""
+    logger.remove()
+
+    # Добавляем вывод в консоль с цветами и форматированием
+    logger.add(
+        sys.stdout,
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
+        level="DEBUG",
+        colorize=True
+    )
+
+    # Добавляем вывод в файл с ротацией
+    logger.add(
+        "logs/app.log",
+        rotation="10 MB",  # Ротация при достижении 10 MB
+        retention="7 days",  # Хранить 7 дней
+        compression="zip",  # Сжимать старые логи
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
+        level="INFO",
+        encoding="utf-8"
+    )
+
+    # Отдельный файл для ошибок
+    logger.add(
+        "logs/errors.log",
+        level="ERROR",
+        rotation="100 MB",
+        retention="30 days",
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} | {message}",
+        encoding="utf-8",
+        backtrace=True,  # Показывать полный traceback
+        diagnose=True  # Показывать переменные при ошибке
+    )
+
     bot = Bot(
         token=settings.bot_token,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
