@@ -68,9 +68,7 @@ async def apply_scheduler_jobs(scheduler: AsyncIOScheduler, bot: Bot) -> None:
     scheduler.add_job(
         job_assign_daily_products,
         "cron",
-        # hour=runtime.daily_assign_hour,
-        hour=11,
-        minute=33,
+        hour=runtime.daily_assign_hour,
         id="assign_daily_products",
         replace_existing=True,
     )
